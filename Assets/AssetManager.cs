@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,15 +9,24 @@ namespace Mantodea.Assets
 {
     public abstract class AssetManager<T>
     {
-        public virtual void Load()
+        public async virtual Task Load()
         {
-            var dicts = GetType().GetFields().Where(t => t.FieldType == typeof(Dictionary<string, T>)).ToList();
+            GetType().GetFields()
+                .Where(t => t.FieldType == typeof(ConcurrentDictionary<string, T>))
+                .ToList().ForEach(t =>
+                {
+                    t.SetValue(this, (ConcurrentDictionary<string, T>)[]);
+                });
 
-            dicts.ForEach(t => t.SetValue(this, (Dictionary<string, T>)[]));
-
-            dicts.ForEach(t => LoadOneTarget(t.Name, t.GetValue(this) as Dictionary<string, T>));
+            GetType().GetFields()
+                .Where(t => t.FieldType == typeof(ConcurrentDictionary<string, T>))
+                .ToList().ForEach(t =>
+                {
+                    var a = t.GetValue(this) as ConcurrentDictionary<string, T>;
+                    LoadOne(t.Name, a);
+                });
         }
 
-        public abstract void LoadOneTarget(string dir, Dictionary<string, T> dictronary);
+        public abstract void LoadOne(string dir, ConcurrentDictionary<string, T> dictronary);
     }
 }

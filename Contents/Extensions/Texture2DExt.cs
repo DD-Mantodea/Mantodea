@@ -6,6 +6,36 @@ namespace Mantodea.Extensions
 {
     public static class Texture2DExt
     {
+        public static Texture2D Scale(this Texture2D texture, int scale)
+        {
+            var result = new Texture2D(Core.Instance?.GraphicsDevice, texture.Width * scale, texture.Height * scale);
+
+            var sourceDatas = new Color[texture.Width * texture.Height];
+
+            var resultDatas = new Color[result.Width, result.Height];
+
+            texture.GetData(sourceDatas);
+
+            for (int i = 0; i < texture.Width; i++)
+            {
+                for (int j = 0; j < texture.Height; j++)
+                {
+                    if (sourceDatas[j * texture.Width + i].A == 0) continue;
+                    for (int k = 0; k < scale * scale; k++)
+                        resultDatas[i * scale + k % scale, j * scale + k / scale] = sourceDatas[j * texture.Width + i];
+                }
+            }
+
+            Color[] resDatas = new Color[resultDatas.Length];
+
+            for (int i = 0; i < resDatas.Length; i++)
+                resDatas[i] = resultDatas[i % result.Width, i / result.Width];
+
+            result.SetData(resDatas);
+
+            return result;
+        }
+
         public static Texture2D Scale(this Texture2D texture, float scale)
         {
             int newWidth = (int)(texture.Width * scale);

@@ -1,5 +1,6 @@
 ﻿using Mantodea.Contents.UI;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,6 +20,10 @@ namespace Mantodea
                 PreferredBackBufferHeight = gameHeight
             };
 
+            GameHeight = gameHeight;
+
+            GameWidth = gameWidth;
+
             IsMouseVisible = true;
 
             Random = new();
@@ -32,13 +37,28 @@ namespace Mantodea
 
         public static GraphicsDeviceManager? Graphics;
 
-        public static Matrix GlobalUIScale = Matrix.Identity;
+        public static SpriteBatch SpriteBatch;
+
+        public static int GameHeight { get; set; }
+
+        public static int GameWidth { get; set; }
+
+        public static Vector2 GameSize => new(GameWidth, GameHeight);
 
         protected override void Update(GameTime gameTime)
         {
             UserInput.Update();
 
             base.Update(gameTime);
+        }
+
+        protected override void Initialize()
+        {
+            UserInput.Initialize();
+
+            SpriteBatch = new(GraphicsDevice);
+
+            base.Initialize();
         }
     }
 

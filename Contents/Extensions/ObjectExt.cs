@@ -9,13 +9,15 @@ namespace Mantodea.Contents.Extensions
 {
     public static class ObjectExt
     {
-        public static object GetClone(this object obj)
+        public static T GetClone<T>(this T obj) where T : class
         {
             if (obj is string || obj.GetType().IsValueType)
                 return obj;
 
             object retval = Activator.CreateInstance(obj.GetType());
-            FieldInfo[] fields = obj.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+
+            FieldInfo[] fields = obj.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
             foreach (var field in fields)
             {
                 try
@@ -25,7 +27,7 @@ namespace Mantodea.Contents.Extensions
                 catch { }
             }
 
-            return retval;
+            return retval as T;
         }
     }
 }
